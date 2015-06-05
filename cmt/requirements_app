@@ -1,0 +1,5 @@
+package tpcDataQuality 
+
+use captainRelease
+
+application tpcDataQuality ../app/tpcDataQuality.cxx

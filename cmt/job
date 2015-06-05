@@ -1,0 +1,1 @@
+../Linux-Scientific-6.4-x86_64/TPCDATAQUALITY.exe -tubdaq /project/projectdirs/captain/data/2015/March/cosmic_runs/mCAPTAIN_EXT-4124-0.ubdaq.gz -o mCAPTAIN_EXT-4124-0.root
