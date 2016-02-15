@@ -26,7 +26,8 @@
 #include <exception>
 #include <list>
 
-
+const int NWIREPERPLANE=332;
+const int NBASELINEBINS=1000;
 
 /////////////////////////////////////////////////////////////////
 // Initialize any class specific variables, but most of the work can be
@@ -64,7 +65,7 @@ bool CP::TTPCDataQuality::operator () (CP::TEvent& event) {
 	    }
 
 	    TH1F *waveform_proj_ch = new TH1F(Form("waveform_proj_ch%d_event%d",counter,eventid), Form("Event %d, Waveform projection for channel %d;ADC;Entries",eventid,counter),5000,0,5000);
-            for (std::size_t i = 1; i< pulse->GetSampleCount(); ++i) {
+            for (std::size_t i = 1; i< NBASELINEBINS + 1; ++i) {
 	        waveform_proj_ch->Fill(pulse->GetSample(i));
             }
 
@@ -90,7 +91,7 @@ bool CP::TTPCDataQuality::operator () (CP::TEvent& event) {
 		        fPulseCheckPositive_h[1]->Fill(counter);
 
 		        if(fWirePlane.at(counter) != -1 && fWireNumber.at(counter) != -1) {
-		            fPulseCheckPositive_h[0]->Fill((2 - fWirePlane.at(counter)) * 335 + fWireNumber.at(counter) + 1);
+		            fPulseCheckPositive_h[0]->Fill((2 - fWirePlane.at(counter)) * NWIREPERPLANE + fWireNumber.at(counter) + 1);
 		            fPulseCheckPositive_h[2]->Fill(counter);
 		        }
 		        else {
@@ -105,7 +106,7 @@ bool CP::TTPCDataQuality::operator () (CP::TEvent& event) {
 		        fPulseCheckNegative_h[1]->Fill(counter);
 
 		        if(fWirePlane.at(counter) != -1 && fWireNumber.at(counter) != -1) {
-		            fPulseCheckNegative_h[0]->Fill((2 - fWirePlane.at(counter)) * 335 + fWireNumber.at(counter) + 1);
+		            fPulseCheckNegative_h[0]->Fill((2 - fWirePlane.at(counter)) * NWIREPERPLANE + fWireNumber.at(counter) + 1);
 		            fPulseCheckNegative_h[2]->Fill(counter);
 		        }
 		        else {
@@ -149,13 +150,13 @@ bool CP::TTPCDataQuality::operator () (CP::TEvent& event) {
 void CP::TTPCDataQuality::Initialize(void) {
   
     fTotalChannelCount = 1152;
-    fTotalWireCount = 1005;
+    fTotalWireCount = NWIREPERPLANE*3;
     int frequency_up = 1000000;
     fTotalEvents = 0;
     fLoadWireID = false;
     const std::string name_suffix[4] = {"wire", "ch", "conn_ch", "disc_ch"};
     const std::string title_suffix[4] = {"Wire", "Channel", "Connected Channel", "Disconnected Channel"};
-    const std::string titlex_suffix[4] = {"Wire [U (0,334), V (335,669), X(670,1004)]", "Channel", "Channel", "Channel"};
+    const std::string titlex_suffix[4] = {Form("Wire [U (0,%d), V (%d,%d), X(%d,%d)]",NWIREPERPLANE-1,NWIREPERPLANE,NWIREPERPLANE*2-1,NWIREPERPLANE*2,NWIREPERPLANE*3-1), "Channel", "Channel", "Channel"};
     const int totalbins[4] = {fTotalWireCount, fTotalChannelCount, fTotalChannelCount, fTotalChannelCount};
 
     if(fApplyBaselineCheck) {
@@ -215,8 +216,8 @@ void CP::TTPCDataQuality::Finalize(CP::TRootOutput* const output) {
             fBaseline_h[1]->SetBinError(ch+1,fBaselineMean_h[ch]->GetRMS());
             if(ch<fWireNumber.size()) {
                 if(fWirePlane.at(ch)!=-1 && fWireNumber.at(ch)!=-1) {
-                    fBaseline_h[0]->SetBinContent((2-fWirePlane.at(ch))*335+fWireNumber.at(ch)+1,fBaselineMean_h[ch]->GetMean());
-                    fBaseline_h[0]->SetBinError((2-fWirePlane.at(ch))*335+fWireNumber.at(ch)+1,fBaselineMean_h[ch]->GetRMS());
+                    fBaseline_h[0]->SetBinContent((2-fWirePlane.at(ch))*NWIREPERPLANE+fWireNumber.at(ch)+1,fBaselineMean_h[ch]->GetMean());
+                    fBaseline_h[0]->SetBinError((2-fWirePlane.at(ch))*NWIREPERPLANE+fWireNumber.at(ch)+1,fBaselineMean_h[ch]->GetRMS());
                     fBaseline_h[2]->SetBinContent(ch+1,fBaselineMean_h[ch]->GetMean());
                     fBaseline_h[2]->SetBinError(ch+1,fBaselineMean_h[ch]->GetRMS());
                 }
@@ -236,8 +237,8 @@ void CP::TTPCDataQuality::Finalize(CP::TRootOutput* const output) {
             fPedestalRMS_h[1]->SetBinError(ch+1,fPedestalRMSMean_h[ch]->GetRMS());
             if(ch<fWireNumber.size()) {
                 if(fWirePlane.at(ch)!=-1 && fWireNumber.at(ch)!=-1) {
-                    fPedestalRMS_h[0]->SetBinContent((2-fWirePlane.at(ch))*335+fWireNumber.at(ch)+1,fPedestalRMSMean_h[ch]->GetMean());
-                    fPedestalRMS_h[0]->SetBinError((2-fWirePlane.at(ch))*335+fWireNumber.at(ch)+1,fPedestalRMSMean_h[ch]->GetRMS());
+                    fPedestalRMS_h[0]->SetBinContent((2-fWirePlane.at(ch))*NWIREPERPLANE+fWireNumber.at(ch)+1,fPedestalRMSMean_h[ch]->GetMean());
+                    fPedestalRMS_h[0]->SetBinError((2-fWirePlane.at(ch))*NWIREPERPLANE+fWireNumber.at(ch)+1,fPedestalRMSMean_h[ch]->GetRMS());
                     fPedestalRMS_h[2]->SetBinContent(ch+1,fPedestalRMSMean_h[ch]->GetMean());
                     fPedestalRMS_h[2]->SetBinError(ch+1,fPedestalRMSMean_h[ch]->GetRMS());
                 }
@@ -278,7 +279,7 @@ void CP::TTPCDataQuality::Finalize(CP::TRootOutput* const output) {
                 fShutoff_h[1]->SetBinContent(ch+1,n_shutoff/fPedestalRMSMean_h[ch]->GetEntries());
                 if(ch<fWireNumber.size()) {
                     if(fWirePlane.at(ch)!=-1 && fWireNumber.at(ch)!=-1) {
-                        fShutoff_h[0]->SetBinContent((2-fWirePlane.at(ch))*335+fWireNumber.at(ch)+1,n_shutoff/fPedestalRMSMean_h[ch]->GetEntries());
+                        fShutoff_h[0]->SetBinContent((2-fWirePlane.at(ch))*NWIREPERPLANE+fWireNumber.at(ch)+1,n_shutoff/fPedestalRMSMean_h[ch]->GetEntries());
                         fShutoff_h[2]->SetBinContent(ch+1,n_shutoff/fPedestalRMSMean_h[ch]->GetEntries());
                     }
                     else {
