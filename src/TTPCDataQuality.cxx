@@ -196,7 +196,7 @@ void CP::TTPCDataQuality::Initialize(void) {
     }
 
     if(fApplyEventTimingCheck) {
-        fEventTiming_h = new TH1F("eventTiming", "Event Timing;Event Time Interval - 1/PulserFrequency (ms);Entries",int (4*fEventTimeBinning/fPulserFrequency),-2/fPulserFrequency,2/fPulserFrequency);
+        fEventTiming_h = new TH1F("eventTiming", "Event Timing;Event Time Interval (ms);Entries",int (4*fEventTimeBinning/fPulserFrequency),-2/fPulserFrequency,2/fPulserFrequency);
     }
 }
 
